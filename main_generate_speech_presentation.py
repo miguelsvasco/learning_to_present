@@ -9,16 +9,20 @@ import base64
 import requests
 
 # Create the writer assistant
-writer_context = ("You are a great writter of speeches for presentations about recent advancements in machine learning. Given these slides, that make a three-slide presentation about recent advacements in machine learning, write three sentences for each slide."),
+writer_context = (
+    (
+        "You are a great writter of speeches for presentations about recent advancements in machine learning. Given these slides, that make a three-slide presentation about recent advacements in machine learning, write three sentences for each slide."
+    ),
+)
 
 
 def save_list_of_lists_to_file(file_path, list_of_lists):
     try:
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             for inner_list in list_of_lists:
                 for item in inner_list:
-                    file.write(item + '\n')
-                file.write('\n')  # Add an empty line between inner lists
+                    file.write(item + "\n")
+                file.write("\n")  # Add an empty line between inner lists
         print(f"List of lists saved to '{file_path}' successfully.")
     except Exception as e:
         print(f"Error saving list of lists to '{file_path}': {e}")
@@ -47,7 +51,7 @@ def download_image(url: str, filename: str) -> bool:
     # Check if the request was successful
     if response.status_code == 200:
         # Open file in binary write mode and write the contents of the response
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             f.write(response.content)
         return True
     else:
@@ -63,7 +67,8 @@ def ask_writer(prompt: List[str], score: int, client: OpenAI) -> List[str]:
                 "content": [
                     {
                         "type": "text",
-                        "text": str(writer_context) + f" Your previous prompts were {str(prompt)} and you got a score of {score}. Generate better prompts.",
+                        "text": str(writer_context)
+                        + f" Your previous prompts were {str(prompt)} and you got a score of {score}. Generate better prompts.",
                     },
                 ],
             }
@@ -78,7 +83,9 @@ def ask_writer(prompt: List[str], score: int, client: OpenAI) -> List[str]:
     return parsed_prompts
 
 
-def ask_designer(prompt: str, iteration: int, slide_number: int, client: OpenAI, image_folder: str) -> None:
+def ask_designer(
+    prompt: str, iteration: int, slide_number: int, client: OpenAI, image_folder: str
+) -> None:
     response = client.images.generate(
         model="dall-e-3",
         prompt=str(prompt),
@@ -136,7 +143,7 @@ def ask_writter(images: List[str], client: OpenAI) -> str:
 # Function to encode the image
 def encode_image(image_path: str) -> str:
     with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 
 def select_images(folder: str, iteration: int) -> List[str]:
@@ -146,7 +153,11 @@ def select_images(folder: str, iteration: int) -> List[str]:
     files = os.listdir(folder_path)
 
     # Filter out files that are not images
-    image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+    image_files = [
+        f
+        for f in files
+        if f.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp"))
+    ]
     assert len(image_files) > 0
 
     # Randomly select an image
@@ -161,7 +172,7 @@ def main() -> None:
     client = OpenAI()
 
     # Load initial set of images
-    image_folder = 'slides/'
+    image_folder = "slides/"
     iteration = 8
 
     # Ask writer for speech
@@ -173,5 +184,5 @@ def main() -> None:
     print(text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
